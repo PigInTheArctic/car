@@ -4,11 +4,11 @@
 #include "user_lib.h"
 
 const Motor_Config motorconfig[]{
-    {&hcan1, 0x206, 1.0f, 0.0f, Wheel_LF},
-    {&hcan1, 0x207, 1.0f, 0.0f, Wheel_RF},
-    {&hcan1, 0x208, 1.0f, 0.0f, Wheel_LB},
-    {&hcan1, 0x209, 1.0f, 0.0f, Wheel_RB},
-    {&hcan1, 0x210, 1.0f, 0.0f, Lead_Screw},
+    {&hcan1, 0x206, M3508_RATIO, 0.0f, Wheel_LF},
+    {&hcan1, 0x207, M3508_RATIO, 0.0f, Wheel_RF},
+    {&hcan1, 0x208, M3508_RATIO, 0.0f, Wheel_LB},
+    {&hcan1, 0x209, M3508_RATIO, 0.0f, Wheel_RB},
+    {&hcan1, 0x210, M3508_RATIO, 0.0f, Lead_Screw},
 };
 
 const Servo_Config servoconfig[]{

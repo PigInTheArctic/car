@@ -248,4 +248,15 @@ namespace math
     {
         return _real_speed * 16384.0f / 20.0f;
     }
+    /**
+     * @brief 将实际转矩转为can发送的值
+     *
+     * @param  torque 实际速度
+     * @return can发送值
+     */
+    float torque_turn_to_sendvalue(float torque)
+    {
+        return FloatConstrain(torque / 0.3f * 3591.0f / 187.0f * 16384.0f / 20.0f, -16384.0f, 16384.0f);
+    }
+
 } // namespace math

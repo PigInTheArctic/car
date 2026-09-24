@@ -11,18 +11,18 @@ Chassis chassis;
 
 void Chassis::Normal_Pid_Init()
 {
-    speed_[0].Init(4.0f, 0.0f, 0.3f, 3.0f, 1.0f);
-    speed_[1].Init(4.0f, 0.0f, 0.3f, 3.0f, 1.0f);
-    speed_[2].Init(4.0f, 0.0f, 0.3f, 3.0f, 1.0f);
-    speed_[3].Init(4.0f, 0.0f, 0.3f, 3.0f, 1.0f);
+    speed_[0].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(10.0f), 1.0f);
+    speed_[1].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(10.0f), 1.0f);
+    speed_[2].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(10.0f), 1.0f);
+    speed_[3].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(10.0f), 1.0f);
 }
 
 void Chassis::Uphill_Pid_Init()
 {
-    speed_[0].Init(10.0f, 0.0f, 0.3f, 3.0f, 1.0f);
-    speed_[1].Init(10.0f, 0.0f, 0.3f, 3.0f, 1.0f);
-    speed_[2].Init(10.0f, 0.0f, 0.3f, 3.0f, 1.0f);
-    speed_[3].Init(10.0f, 0.0f, 0.3f, 3.0f, 1.0f);
+    speed_[0].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
+    speed_[1].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
+    speed_[2].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
+    speed_[3].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
 }
 
 void Chassis::Control()
@@ -44,10 +44,20 @@ void Chassis::Control()
     speed_[2].SetRef(speed_lb);
     speed_[3].SetRef(speed_rb);
 
-    output_I_[0] = math::I_turn_to_sendvalue((int16_t)speed_[0].Calculate() / motorconfig[0].ratio);
-    output_I_[1] = math::I_turn_to_sendvalue((int16_t)speed_[1].Calculate() / motorconfig[1].ratio);
-    output_I_[2] = math::I_turn_to_sendvalue((int16_t)speed_[2].Calculate() / motorconfig[2].ratio);
-    output_I_[3] = math::I_turn_to_sendvalue((int16_t)speed_[3].Calculate() / motorconfig[3].ratio);
+    if (remote.carstatus == remote.CAR_NORMAL)
+    {
+        output_I_[0] = (int16_t)speed_[0].Calculate();
+        output_I_[1] = (int16_t)speed_[1].Calculate();
+        output_I_[2] = (int16_t)speed_[2].Calculate();
+        output_I_[3] = (int16_t)speed_[3].Calculate();
+    }
+    else if (remote.carstatus == remote.CAR_UPHILL)
+    {
+        output_I_[0] = (int16_t)speed_[0].Calculate() + math::torque_turn_to_sendvalue(motorconfig[0].offset); // 16384
+        output_I_[1] = (int16_t)speed_[1].Calculate() + math::torque_turn_to_sendvalue(motorconfig[1].offset);
+        output_I_[2] = (int16_t)speed_[2].Calculate() + math::torque_turn_to_sendvalue(motorconfig[2].offset);
+        output_I_[3] = (int16_t)speed_[3].Calculate() + math::torque_turn_to_sendvalue(motorconfig[3].offset);
+    }
 }
 
 void Chassis::Remote()

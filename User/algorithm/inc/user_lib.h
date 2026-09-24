@@ -45,7 +45,8 @@ namespace math
     float turn_to_real_speed(float _rcv_speed);
     float turn_to_real_angle(float _rcv_angle);
     float I_turn_to_sendvalue(float _real_speed);
-
+    float torque_turn_to_sendvalue(float torque);
+     
 }; // namespace math
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/

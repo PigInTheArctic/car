@@ -6,6 +6,7 @@
 
 #define motor_num 5
 #define servo_num 2
+#define M3508_RATIO 3591.0f / 187.0f
 
 #ifdef __cplusplus
 extern "C"

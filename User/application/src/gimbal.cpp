@@ -18,18 +18,15 @@ void Gimbal::Control()
     speed_.SetMeasure(speed_rcv);
     speed_.SetRef(speed_target);
     output_I_ = math::I_turn_to_sendvalue(speed_.Calculate()); // 丝杠电机控制
-
-    ServoSend(&htim1, TIM_CHANNEL_1, yaw_target_angle);
-    ServoSend(&htim1, TIM_CHANNEL_2, jia_target_angle); // 舵机控制yaw轴与夹爪松紧
 }
 
 void Gimbal::Remote()
-{
+{   
     speed_target += math::YG_Turn_to_incre(remote.Dr16_Data.C1, 1.0f);
     yaw_target_angle += math::YG_Turn_to_incre(remote.Dr16_Data.C2, 1.0f);
     jia_target_angle += math::YG_Turn_to_incre(remote.Dr16_Data.C3, 1.0f);
 
-    speed_target = math::FloatConstrain(speed_target, -500.0f, 500.0f);
+    speed_target = math::FloatConstrain(speed_target, -100.0f, 100.0f);
     yaw_target_angle = math::FloatConstrain(yaw_target_angle, -90.0f, 90.0f);
     jia_target_angle = math::FloatConstrain(jia_target_angle, 0.0f, 45.0f);
 }
