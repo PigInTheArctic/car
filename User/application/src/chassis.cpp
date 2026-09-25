@@ -53,10 +53,10 @@ void Chassis::Control()
     }
     else if (remote.carstatus == remote.CAR_UPHILL)
     {
-        output_I_[0] = (int16_t)speed_[0].Calculate() + math::torque_turn_to_sendvalue(motorconfig[0].offset); // 16384
-        output_I_[1] = (int16_t)speed_[1].Calculate() + math::torque_turn_to_sendvalue(motorconfig[1].offset);
-        output_I_[2] = (int16_t)speed_[2].Calculate() + math::torque_turn_to_sendvalue(motorconfig[2].offset);
-        output_I_[3] = (int16_t)speed_[3].Calculate() + math::torque_turn_to_sendvalue(motorconfig[3].offset);
+        output_I_[0] = (int16_t)speed_[0].Calculate() + math::torque_turn_to_sendvalue(CMP);
+        output_I_[1] = (int16_t)speed_[1].Calculate() + math::torque_turn_to_sendvalue(CMP);
+        output_I_[2] = (int16_t)speed_[2].Calculate() + math::torque_turn_to_sendvalue(CMP);
+        output_I_[3] = (int16_t)speed_[3].Calculate() + math::torque_turn_to_sendvalue(CMP);
     }
 }
 

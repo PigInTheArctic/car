@@ -3,6 +3,8 @@
 
 #include "pid.h"
 
+#define CMP 1.0f
+
 class Chassis
 {
 public:
