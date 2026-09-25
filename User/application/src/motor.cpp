@@ -36,7 +36,7 @@ void MotorCanSend(CAN_HandleTypeDef *_phcan, uint32_t _idx, int16_t _data1, int1
     tx_data[6] = _data4 >> 8;
     tx_data[7] = _data4;
 
-    if (HAL_CAN_AddTxMessage(_phcan, &tx_conf, tx_data, &tx_mailbox) != HAL_OK)
+        if (HAL_CAN_AddTxMessage(_phcan, &tx_conf, tx_data, &tx_mailbox) != HAL_OK)
     {
         return;
     }

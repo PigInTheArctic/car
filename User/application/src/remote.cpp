@@ -3,6 +3,7 @@
 #include "gimbal.h"
 #include "chassis.h"
 #include "bsp_usart.h"
+#include "bsp_can.h"
 #include "stdint.h"
 #include "math.h"
 
@@ -56,7 +57,7 @@ void Remote::judge_status()
 
     Sig_Extreme_Judge();
 
-    if (DT7_IsConnected() == 0)
+    if (DT7_IsConnected() == 0 || Can_IsConnected() == 0)
     {
         carstatus = CAR_REMOTE_LOSS; // 判断是否与DT7失联
     }

@@ -8,6 +8,9 @@
 static uint8_t rx_buffer[8];
 static uint8_t rx_buffer_size = sizeof(rx_buffer);
 struct rx_buff_m rx_can_buff_group[motor_num];
+static volatile uint8_t can_received;
+static volatile uint32_t can_last_rx_ms;
+#define CAN_TIMEOUT_MS 100
 
 void TotalCar_Can_Init(CAN_HandleTypeDef *hcan)
 {
@@ -20,6 +23,11 @@ void TotalCar_Can_Init(CAN_HandleTypeDef *hcan)
       rx_can_buff_group[i].ready_buffer = 0;
       memset(rx_can_buff_group[i].rx_buff, 0, sizeof(rx_can_buff_group[i].rx_buff));
     }
+}
+
+uint8_t Can_IsConnected()
+{
+    return (can_received == 1) && (HAL_GetTick() - can_last_rx_ms <= CAN_TIMEOUT_MS);
 }
 
 void Get_Can_Buff(CAN_HandleTypeDef* hcan,uint32_t _Fifo)
@@ -50,7 +58,7 @@ void Get_Can_Motor_Buff(uint8_t motor_index, uint8_t *rcv_buffer)
     memset(rcv_buffer, 0, 8);
     return;
   }
-
+  
   taskENTER_CRITICAL();
   memcpy(rcv_buffer,
          rx_can_buff_group[motor_index].rx_buff[rx_can_buff_group[motor_index].ready_buffer],
@@ -61,6 +69,11 @@ void Get_Can_Motor_Buff(uint8_t motor_index, uint8_t *rcv_buffer)
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan)
 {
+  if (hcan == &hcan1)
+  {
   Get_Can_Buff(hcan, CAN_RX_FIFO0);
+  can_last_rx_ms = HAL_GetTick();
+  can_received = 1;
+  }
 }
 
