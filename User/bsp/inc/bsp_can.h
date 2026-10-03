@@ -2,7 +2,7 @@
 #define __BSP_CAN_H
 
 #include "can.h"
-
+#include "motor.h"
 #ifdef __cplusplus
 extern "C"
 {
@@ -21,7 +21,7 @@ extern "C"
         volatile uint8_t ready_buffer;
     };
 
-    extern struct rx_buff_m rx_can_buff_group[5];
+    extern struct rx_buff_m rx_can_buff_group[motor_num];
 
 #ifdef __cplusplus
 }
