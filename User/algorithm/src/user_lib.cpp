@@ -261,7 +261,7 @@ namespace math
         return FloatConstrain(torque / 0.3f * 3591.0f / 187.0f * 16384.0f / 20.0f, -16384.0f, 16384.0f);
     }
 
-    float max_element(const int16_t *group, uint8_t length)
+    float maxfab_element(const int16_t *group, uint8_t length)
     {
         float maximum = group[0];
         for (uint8_t i = 1; i < length; i++)

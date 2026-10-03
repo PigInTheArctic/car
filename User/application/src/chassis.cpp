@@ -83,24 +83,29 @@ void Chassis::Pid_Clear_Control()
 
 void Chassis::Output_Limit()
 {
-    float max_one = 0;
-    float k = 1.0f;
+    float max_one = math::maxfab_element(output_I_, chassis_motor_num);
     if (remote.carstatus == remote.CAR_NORMAL)
     {
-        max_one = math::max_element(output_I_, chassis_motor_num);
-        k = math::I_turn_to_sendvalue(normal_max_I) / max_one;
-        for (uint8_t i = 0; i < chassis_motor_num; i++)
+        float max_allowed = math::I_turn_to_sendvalue(normal_max_I);
+        if (max_one > max_allowed)
         {
-            output_I_[i] *= k;
+            float k = max_allowed / max_one;
+            for (uint8_t i = 0; i < chassis_motor_num; i++)
+            {
+                output_I_[i] *= k;
+            }
         }
     }
     else if (remote.carstatus == remote.CAR_UPHILL)
     {
-        max_one = math::max_element(output_I_, chassis_motor_num);
-        k = math::I_turn_to_sendvalue(uphill_max_I) / max_one;
-        for (uint8_t i = 0; i < chassis_motor_num; i++)
+        float max_allowed = math::I_turn_to_sendvalue(uphill_max_I);
+        if (max_one > max_allowed)
         {
-            output_I_[i] *= k;
+            float k = max_allowed / max_one;
+            for (uint8_t i = 0; i < chassis_motor_num; i++)
+            {
+                output_I_[i] *= k;
+            }
         }
     }
 }
