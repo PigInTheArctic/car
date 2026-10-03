@@ -14,10 +14,13 @@ public:
     void Uphill_Pid_Init();
 
     void Control();
+    void Output_Limit();
     void SetYawSpeed(float _r_target_) { r_target_ = _r_target_; };
     void SetXSpeed(float _xspd) { x_target_ = _xspd; };
     void SetYSpeed(float _yspd) { y_target_ = _yspd; };
     void Remote();
+
+    static const uint8_t chassis_motor_num = 4;
 
     int16_t output_I_[4];
     float speed_lf_rcv, speed_rf_rcv, speed_lb_rcv, speed_rb_rcv;
@@ -28,6 +31,8 @@ private:
     float speed_lf, speed_rf, speed_lb, speed_rb;
     float angle_lf, angle_rf, angle_lb, angle_rb;
     void Pid_Clear_Control();
+    static const float normal_max_I = 10.0f;
+    static const float uphill_max_I = 20.0f;
 };
 
 extern Chassis chassis;

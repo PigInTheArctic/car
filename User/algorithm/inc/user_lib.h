@@ -42,11 +42,11 @@ namespace math
 
     uint16_t angle_turn_to_ccr(float _angle);
     float YG_Turn_to_incre(float _dr16_data, float _max_pace);
-    float turn_to_real_speed(float _rcv_speed);
+    float YG_Turn_to_speed(float _dr16_data, float _max_speed);
     float turn_to_real_angle(float _rcv_angle);
     float I_turn_to_sendvalue(float _real_speed);
     float torque_turn_to_sendvalue(float torque);
-     
+    float max_element(const int16_t *group, uint8_t length);
 }; // namespace math
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/

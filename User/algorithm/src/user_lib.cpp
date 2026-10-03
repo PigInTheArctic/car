@@ -219,15 +219,17 @@ namespace math
     }
 
     /**
-     * @brief 将读取到的can回传值转为对应的实际速度
+     * @brief 将遥控器的摇杆值转为摇杆控制的范围
      *
-     * @param _rcv_speed 读取到的can回传值
-     * @return 对应的实际速度
+     * @param _dr16_data 读取到的遥控器遥感值
+     * @param _max_speed 最大期望速度
+     * @return 对应的增量
      */
-    float turn_to_real_speed(float _rcv_speed)
+    float YG_Turn_to_speed(float _dr16_data, float _max_speed)
     {
-        return _rcv_speed / 16384.0f * 20.0f;
+        return (_dr16_data - 1024.0f) / 1320.0f * 2.0f * _max_speed;
     }
+
     /**
      * @brief 将读取到的can回传值转为对应的实际角度
      *
@@ -259,4 +261,16 @@ namespace math
         return FloatConstrain(torque / 0.3f * 3591.0f / 187.0f * 16384.0f / 20.0f, -16384.0f, 16384.0f);
     }
 
+    float max_element(const int16_t *group, uint8_t length)
+    {
+        float maximum = group[0];
+        for (uint8_t i = 1; i < length; i++)
+        {
+            if (group[i] > maximum)
+            {
+                maximum = group[i];
+            }
+        }
+        return maximum;
+    }
 } // namespace math
