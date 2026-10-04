@@ -46,17 +46,17 @@ void Chassis::Control()
 
     if (remote.carstatus == remote.CAR_NORMAL)
     {
-        output_I_[0] = (int16_t)speed_[0].Calculate();
+        output_I_[0] = -(int16_t)speed_[0].Calculate();
         output_I_[1] = (int16_t)speed_[1].Calculate();
-        output_I_[2] = (int16_t)speed_[2].Calculate();
+        output_I_[2] = -(int16_t)speed_[2].Calculate();
         output_I_[3] = (int16_t)speed_[3].Calculate();
         Output_Limit();
     }
     else if (remote.carstatus == remote.CAR_UPHILL)
     {
-        output_I_[0] = (int16_t)speed_[0].Calculate() + math::torque_turn_to_sendvalue(CMP);
+        output_I_[0] = -(int16_t)speed_[0].Calculate() + math::torque_turn_to_sendvalue(CMP);
         output_I_[1] = (int16_t)speed_[1].Calculate() + math::torque_turn_to_sendvalue(CMP);
-        output_I_[2] = (int16_t)speed_[2].Calculate() + math::torque_turn_to_sendvalue(CMP);
+        output_I_[2] = -(int16_t)speed_[2].Calculate() + math::torque_turn_to_sendvalue(CMP);
         output_I_[3] = (int16_t)speed_[3].Calculate() + math::torque_turn_to_sendvalue(CMP);
         Output_Limit();
     }
