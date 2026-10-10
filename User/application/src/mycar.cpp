@@ -33,28 +33,39 @@ void Chassis_Task()
 
 void Send_Task()
 {
-    if (remote.carstatus == remote.Car_Status::CAR_STOP || remote.carstatus == remote.Car_Status::CAR_REMOTE_LOSS)
+    if (remote.carstatus == remote.CAR_STOP || remote.carstatus == remote.CAR_REMOTE_LOSS || remote.carstatus == remote.None)
     {
         MotorCanSend(&hcan1, 0x200, 0, 0, 0, 0);
         MotorCanSend(&hcan1, 0x1FF, 0, 0, 0, 0);
         ServoSend(&htim1, TIM_CHANNEL_1, 0);
         ServoSend(&htim1, TIM_CHANNEL_2, 0);
     }
-    else if (remote.sig_extreme_flag)
-    {
-        MotorCanSend(&hcan1, 0x200, chassis.output_I_[0], chassis.output_I_[1], chassis.output_I_[2], chassis.output_I_[3]);
-        MotorCanSend(&hcan1, 0x1FF, 0, 0, 0, 0);
-        ServoSend(&htim1, TIM_CHANNEL_1, gimbal.yaw_target_angle);
-        ServoSend(&htim1, TIM_CHANNEL_2, gimbal.jia_target_angle);
-        gimbal.SetSigSpeed(0);
-        remote.sig_extreme_flag = 0;
-    }
     else
     {
         MotorCanSend(&hcan1, 0x200, chassis.output_I_[0], chassis.output_I_[1], chassis.output_I_[2], chassis.output_I_[3]);
-        MotorCanSend(&hcan1, 0x1FF, gimbal.output_I_, 0, 0, 0);
         ServoSend(&htim1, TIM_CHANNEL_1, gimbal.yaw_target_angle);
         ServoSend(&htim1, TIM_CHANNEL_2, gimbal.jia_target_angle);
+
+        if (remote.carstatus == remote.CAR_GIMBAL_WORK)
+        {
+            MotorCanSend(&hcan1, 0x1FF, 0, 0, 0, 0);
+        }
+        else
+        {
+            if (remote.sig_extreme_flag)
+            {
+                MotorCanSend(&hcan1, 0x1FF, 0, 0, 0, 0);
+                remote.YG_Toward_Change_Judge();
+                if (remote.yg_toward_flag < 0)
+                {
+                    remote.sig_extreme_flag = 0;
+                }
+            }
+            else
+            {
+                MotorCanSend(&hcan1, 0x1FF, gimbal.output_I_, 0, 0, 0);
+            }
+        }
     }
 }
 

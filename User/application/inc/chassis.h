@@ -21,7 +21,7 @@ public:
     void Remote();
 
     static const uint8_t chassis_motor_num = 4;
-    static constexpr float normal_max_I = 10.0f;
+    static constexpr float normal_max_I = 15.0f;
     static constexpr float uphill_max_I = 20.0f;
 
     int16_t output_I_[4];

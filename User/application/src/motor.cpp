@@ -4,11 +4,11 @@
 #include "user_lib.h"
 
 const Motor_Config motorconfig[]{
-    {&hcan1, 0x206, M3508_RATIO, 0.0f, Wheel_LF},
-    {&hcan1, 0x207, M3508_RATIO, 0.0f, Wheel_RF},
-    {&hcan1, 0x208, M3508_RATIO, 0.0f, Wheel_LB},
-    {&hcan1, 0x209, M3508_RATIO, 0.0f, Wheel_RB},
-    {&hcan1, 0x210, M3508_RATIO, 0.0f, Lead_Screw},
+    {&hcan1, 0x201, M3508_RATIO, 0.0f, Wheel_LF},
+    {&hcan1, 0x202, M3508_RATIO, 0.0f, Wheel_RF},
+    {&hcan1, 0x203, M3508_RATIO, 0.0f, Wheel_LB},
+    {&hcan1, 0x204, M3508_RATIO, 0.0f, Wheel_RB},
+    {&hcan1, 0x205, M3508_RATIO, 0.0f, Lead_Screw},
 };
 
 const Servo_Config servoconfig[]{
@@ -36,7 +36,7 @@ void MotorCanSend(CAN_HandleTypeDef *_phcan, uint32_t _idx, int16_t _data1, int1
     tx_data[6] = _data4 >> 8;
     tx_data[7] = _data4;
 
-        if (HAL_CAN_AddTxMessage(_phcan, &tx_conf, tx_data, &tx_mailbox) != HAL_OK)
+    if (HAL_CAN_AddTxMessage(_phcan, &tx_conf, tx_data, &tx_mailbox) != HAL_OK)
     {
         return;
     }

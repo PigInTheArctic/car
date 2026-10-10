@@ -196,7 +196,7 @@ namespace math
      */
     uint16_t angle_turn_to_ccr(float _angle)
     {
-        float ccr_value = ((_angle + 135.0f) / 135.0f + 0.5f) * 1000.0f;
+        float ccr_value = ((_angle + 90.0f) / 90.0f + 0.5f) * 1000.0f;
 
         if (ccr_value <= 500.0f)
             ccr_value = 500.0f;
@@ -238,7 +238,7 @@ namespace math
      */
     float turn_to_real_angle(float _rcv_angle)
     {
-        return _rcv_angle / 8191.0f * 360.0f - 180.0f;
+        return (_rcv_angle - 4096.0f) / 8191.0f * 360.0f;
     }
     /**
      * @brief 将实际速度转为can发送的值
@@ -258,7 +258,7 @@ namespace math
      */
     float torque_turn_to_sendvalue(float torque)
     {
-        return FloatConstrain(torque / 0.3f * 3591.0f / 187.0f * 16384.0f / 20.0f, -16384.0f, 16384.0f);
+        return FloatConstrain(torque / 0.3f / 3591.0f * 187.0f * 16384.0f / 20.0f, -16384.0f, 16384.0f);
     }
 
     float maxfab_element(const int16_t *group, uint8_t length)

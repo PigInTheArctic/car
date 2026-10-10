@@ -12,12 +12,27 @@ static volatile uint32_t dt7_last_rx_ms;
 
 #define DT7_TIMEOUT_MS 100
 
+static void USART_StartReceive(UART_HandleTypeDef *huart)
+{
+  memset(rx_buffer, 0, rx_buffer_size);
+  if (HAL_UARTEx_ReceiveToIdle_DMA(huart, rx_buffer, rx_buffer_size) != HAL_OK)
+  {
+    Error_Handler();
+    return;
+  }
+  __HAL_DMA_DISABLE_IT(huart->hdmarx, DMA_IT_HT);
+}
+
 void TotalCar_USART_Init(UART_HandleTypeDef *huart)
 {
   dt7_received = 0;
   dt7_last_rx_ms = HAL_GetTick();
-  HAL_UARTEx_ReceiveToIdle_DMA(huart,rx_buffer,rx_buffer_size);
-  __HAL_DMA_DISABLE_IT(huart->hdmarx, DMA_IT_HT);
+  if (huart != &huart3)
+  {
+    Error_Handler();
+    return;
+  }
+  USART_StartReceive(huart);
 }
 
 void Get_DT7_Buff(uint8_t *rcv_buffer)
@@ -43,8 +58,16 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef* huart,uint16_t Size)
     dt7_received = 1;
   }
 
-  memset(rx_buffer,0,rx_buffer_size);
-  HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,rx_buffer_size);
-  __HAL_DMA_DISABLE_IT(huart3.hdmarx,DMA_IT_HT);
+  USART_StartReceive(huart);
 }
 
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+  if (huart != &huart3)
+  {
+    return;
+  }
+
+  __HAL_UART_CLEAR_PEFLAG(huart); //清理错误标志，避免妨碍接收
+  USART_StartReceive(huart);
+}

@@ -13,6 +13,7 @@ Decode decode;
 
 void Decode::dr16_decode(void)
 {
+   remote.Dr16_Data.Last_C1 = remote.Dr16_Data.C1; 
    remote.Dr16_Data.C0 = rcv_dr16_buffer[0] | (rcv_dr16_buffer[1] & 0x07) << 8;
    remote.Dr16_Data.C1 = (rcv_dr16_buffer[1] >> 3) | (rcv_dr16_buffer[2] & 0x3F) << 5;
    remote.Dr16_Data.C2 = (rcv_dr16_buffer[2] >> 6) | (rcv_dr16_buffer[3] << 2) | (rcv_dr16_buffer[4] & 0x01) << 10;

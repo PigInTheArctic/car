@@ -10,6 +10,7 @@ class Remote
 public:
     void mode_task();
     void Mode_Change_Acknowledge(uint8_t ack);
+    void YG_Toward_Change_Judge();
 
     enum Mode_Change_Ack
     {
@@ -23,6 +24,7 @@ public:
         CAR_STOP,
         CAR_NORMAL,
         CAR_UPHILL,
+        CAR_GIMBAL_WORK,
         CAR_REMOTE_LOSS,
     };
 
@@ -38,17 +40,20 @@ public:
         float S1;
         float S2;
         float Bo;
+        float Last_C1;
     };
     struct Dr16 Dr16_Data;
 
     volatile uint8_t mode_change_flag = 0;
     volatile uint8_t sig_extreme_flag = 0;
+    volatile uint8_t yg_toward_flag = 1;
 
 private:
     uint8_t mode_change_ack = 0;
     uint16_t sig_extreme_count = 0;
     void judge_status();
     void Mode_Change_Judge();
+
     void Sig_Extreme_Judge();
 };
 

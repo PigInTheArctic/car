@@ -4,6 +4,7 @@
 #include "chassis.h"
 #include "bsp_usart.h"
 #include "bsp_can.h"
+#include "user_lib.h"
 #include "stdint.h"
 #include "math.h"
 
@@ -39,6 +40,15 @@ void Remote::mode_task()
         chassis.Remote();
         gimbal.Remote();
         break;
+    case CAR_GIMBAL_WORK:
+        if (lastcarstatus != CAR_GIMBAL_WORK)
+        {
+            chassis.Normal_Pid_Init();
+            gimbal.SetSigSpeed(0);
+        }
+        chassis.Remote();
+        gimbal.Remote();
+        break;
     case CAR_REMOTE_LOSS:
         gimbal.SetjiaAngle(0);
         gimbal.SetYawAngle(0);
@@ -61,24 +71,27 @@ void Remote::judge_status()
     {
         carstatus = CAR_REMOTE_LOSS; // 判断是否与DT7失联
     }
-    else if (Dr16_Data.S1 == 1)
+    else if (Dr16_Data.S1 == 1 || Dr16_Data.S1 == 3)
     {
         carstatus = CAR_STOP;
     }
     else if (Dr16_Data.S1 == 2)
     {
-        if (Dr16_Data.S2 == 2)
+        if (Dr16_Data.S2 == 3)
         {
             carstatus = CAR_NORMAL;
         }
-        else if (Dr16_Data.S2 == 3)
+        else if (Dr16_Data.S2 == 1)
         {
             carstatus = CAR_UPHILL;
+        }
+        else if (Dr16_Data.S2 == 2)
+        {
+            carstatus = CAR_GIMBAL_WORK;
         }
     }
 
     Mode_Change_Judge();
-
     lastcarstatus = carstatus;
 }
 
@@ -109,7 +122,7 @@ void Remote::Mode_Change_Acknowledge(uint8_t ack)
 
 void Remote::Sig_Extreme_Judge()
 {
-    if (fabsf(gimbal.output_I_) >= sig_extreme_I)
+    if (fabsf(gimbal.output_I_) >= math::I_turn_to_sendvalue(sig_extreme_I))
     {
         sig_extreme_count++;
     }
@@ -122,5 +135,13 @@ void Remote::Sig_Extreme_Judge()
     {
         sig_extreme_flag = 1;
         sig_extreme_count = 0;
+    }
+}
+
+void Remote::YG_Toward_Change_Judge()
+{
+    if (((Dr16_Data.C1 - 1024) > 0) != ((Dr16_Data.Last_C1 - 1024) > 0) || ((Dr16_Data.Last_C1 - 1024) == 0 && (Dr16_Data.C1 - 1024) < 0))
+    {
+        yg_toward_flag = -yg_toward_flag;
     }
 }

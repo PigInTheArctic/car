@@ -5,24 +5,25 @@
 #include "user_lib.h"
 #include "remote.h"
 
-#define L 3
+#define L 1
+#define scale_add 1.5
 
 Chassis chassis;
 
 void Chassis::Normal_Pid_Init()
 {
-    speed_[0].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
-    speed_[1].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
-    speed_[2].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
-    speed_[3].Init(4.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(18.0f), 1.0f);
+    speed_[0].Init(35.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
+    speed_[1].Init(35.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
+    speed_[2].Init(35.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
+    speed_[3].Init(35.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
 }
 
 void Chassis::Uphill_Pid_Init()
 {
-    speed_[0].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
-    speed_[1].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
-    speed_[2].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
-    speed_[3].Init(10.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
+    speed_[0].Init(60.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
+    speed_[1].Init(60.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
+    speed_[2].Init(60.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
+    speed_[3].Init(60.0f, 0.0f, 0.3f, math::I_turn_to_sendvalue(20.0f), 1.0f);
 }
 
 void Chassis::Control()
@@ -40,33 +41,41 @@ void Chassis::Control()
     speed_rb = x_target_ - y_target_ + L * r_target_;
 
     speed_[0].SetRef(speed_lf);
-    speed_[1].SetRef(speed_rf);
+    speed_[1].SetRef(-speed_rf);
     speed_[2].SetRef(speed_lb);
-    speed_[3].SetRef(speed_rb);
+    speed_[3].SetRef(-speed_rb);
 
-    if (remote.carstatus == remote.CAR_NORMAL)
+    if (remote.carstatus == remote.CAR_NORMAL || remote.carstatus == remote.CAR_NORMAL || remote.carstatus == remote.CAR_GIMBAL_WORK)
     {
-        output_I_[0] = -(int16_t)speed_[0].Calculate();
+        output_I_[0] = (int16_t)speed_[0].Calculate();
         output_I_[1] = (int16_t)speed_[1].Calculate();
-        output_I_[2] = -(int16_t)speed_[2].Calculate();
+        output_I_[2] = (int16_t)speed_[2].Calculate();
         output_I_[3] = (int16_t)speed_[3].Calculate();
-        Output_Limit();
-    }
-    else if (remote.carstatus == remote.CAR_UPHILL)
-    {
-        output_I_[0] = -(int16_t)speed_[0].Calculate() + math::torque_turn_to_sendvalue(CMP);
-        output_I_[1] = (int16_t)speed_[1].Calculate() + math::torque_turn_to_sendvalue(CMP);
-        output_I_[2] = -(int16_t)speed_[2].Calculate() + math::torque_turn_to_sendvalue(CMP);
-        output_I_[3] = (int16_t)speed_[3].Calculate() + math::torque_turn_to_sendvalue(CMP);
         Output_Limit();
     }
 }
 
+// + math::torque_turn_to_sendvalue(CMP)
 void Chassis::Remote()
 {
-    x_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C1, 50.0f);
-    y_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C2, 50.0f);
-    r_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C3, 50.0f);
+    if(remote.carstatus == remote.CAR_NORMAL)
+    {
+        x_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C3, 100.0f);
+        y_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C2, 100.0f);
+        r_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C0, 50.0f);
+    }
+    else if(remote.carstatus == remote.CAR_UPHILL)
+    {
+        x_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C3, 200.0f);
+        y_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C2, 200.0f);
+        r_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C0, 50.0f); 
+    }
+    else if(remote.carstatus == remote.CAR_GIMBAL_WORK)
+    {
+        x_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C3, 100.0f);
+        y_target_ = math::YG_Turn_to_speed(remote.Dr16_Data.C2, 100.0f);
+        r_target_ = 0; 
+    }
 }
 
 void Chassis::Pid_Clear_Control()
@@ -76,6 +85,7 @@ void Chassis::Pid_Clear_Control()
         for (uint8_t i = 0; i < chassis_motor_num; i++)
         {
             speed_[i].Clear();
+            output_I_[i] = 0;
         }
         remote.Mode_Change_Acknowledge(Remote::MODE_ACK_CHASSIS);
     }
@@ -84,7 +94,7 @@ void Chassis::Pid_Clear_Control()
 void Chassis::Output_Limit()
 {
     float max_one = math::maxfab_element(output_I_, chassis_motor_num);
-    if (remote.carstatus == remote.CAR_NORMAL)
+    if (remote.carstatus == remote.CAR_NORMAL || remote.carstatus == remote.CAR_GIMBAL_WORK)
     {
         float max_allowed = math::I_turn_to_sendvalue(normal_max_I);
         if (max_one > max_allowed)
